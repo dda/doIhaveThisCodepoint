@@ -1,0 +1,5 @@
+﻿## Do I have This Codepoint?
+
+A little hack inspired by this question on stackoverflow: http://stackoverflow.com/questions/10665933/removing-unsupported-unicode-characters-otherwise-shown-as-squares
+
+Basically it draws in a canvas the codepoint you pass it and the 0xFFFF char (which should appear as a square) and compares both. It returns a likeness score. If it's 100 you have a match --> the character is not present in the font.

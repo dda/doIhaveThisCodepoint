@@ -1,0 +1,92 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>Do I have this char?</title>
+<script type="text/javascript">
+var n=0;
+
+function test() {
+  var myInput = document.getElementById('myInput').value;
+  if(myInput.substring(0,2)!="U+") return;
+  var myChar=String.fromCharCode("0x"+myInput.substring(2));
+  var canvas = document.getElementById('mycanvas');
+  canvas.width=300;
+  canvas.height=100;
+  var ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#eee';
+  ctx.fillRect(0,0,100,50);
+  ctx.fillStyle = '#000';
+  ctx.font = '24px Sans-Serif';
+  ctx.textBaseline = 'Top';
+  ctx.fillText(myChar, 0, 20);
+  ctx.fillText(String.fromCharCode(0xFFFF), 30, 20);
+  n=0;
+  var score=testCanvas(ctx);
+  console.log(score);
+  ctx.font = 'Italic 14px Serif';
+  if(score>95){
+    ctx.fillText("Looks like your font doesn't have this one...", 0, 80);
+  } else {
+    ctx.fillText("Looks like your font has this one...", 0, 80);
+  }
+}
+
+function gPixel(myImageData, px, py) {
+  var i=((py*(myImageData.width*4)) + (px*4));
+  var imageData=myImageData.data;
+  var X=new Object();
+  X.red=imageData[i++];
+  X.green=imageData[i++];
+  X.blue=imageData[i++];
+  X.alpha=imageData[i];
+  return X;
+}
+
+function sPixel(myImageData, px, py, X) {
+  var i=((py*(myImageData.width*4)) + (px*4));
+  var imageData=myImageData.data;
+  imageData[i++]=X.red;
+  imageData[i++]=X.green;
+  imageData[i++]=X.blue;
+  imageData[i]=X.alpha;
+  myImageData.data=imageData;
+}
+
+function testCanvas(ctx) {
+  var i,j;
+  n=0;
+  var w=30;
+  var h=25;
+  var myImageData = ctx.getImageData(0, 0, w*2, h);
+  var score=0;
+  var maxPoints=0;
+  for(j=0;j<h;j++) {
+   var tmp=[];
+    for(i=0;i<w;i++) {
+      var c0=gPixel(myImageData, i, j);
+      var c1=gPixel(myImageData, i+w, j);
+      var k0=(c0.red+c0.green+c0.blue)/3;
+      var k1=(c1.red+c1.green+c1.blue)/3;
+      tmp.push(k0+" vs "+k1);
+      if(k0!=238)maxPoints++;
+      if(k0!=238||k1!=238){
+        if(k1==k0) score++;
+      }
+    }
+  }
+  return Math.floor(score/maxPoints*100);
+}
+
+</script>
+
+</head><body>
+<input type="text" name="myInput" id="myInput" value="U+9090" />
+<input type="button" value="check" onClick="test();" />
+<hr />
+
+<canvas id="mycanvas"></canvas>
+
+
+</body>
+</html>
