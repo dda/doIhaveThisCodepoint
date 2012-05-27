@@ -6,10 +6,28 @@
 <script type="text/javascript">
 var n=0;
 
+function fromOutsideBMP(cp) {
+// 0x01D120
+  var x=cp-0x10000;
+  var top10=parseInt("11111111110000000000",2);
+  var end10=parseInt("1111111111",2);
+  var part1=(x&top10)/1024+0xD800;
+  var part2=(x&end10)+0xDC00;
+  console.log(part1.toString(16), part2.toString(16));
+  var s=String.fromCharCode(part1)+String.fromCharCode(part2);
+  return s;
+}
+
 function test() {
   var myInput = document.getElementById('myInput').value;
   if(myInput.substring(0,2)!="U+") return;
-  var myChar=String.fromCharCode("0x"+myInput.substring(2));
+  var val=parseInt("0x"+myInput.substring(2));
+  var myChar='';
+  if(val>0xFFFF) {
+    myChar=fromOutsideBMP(val);
+  } else {
+    myChar=String.fromCharCode();
+  }
   var canvas = document.getElementById('mycanvas');
   canvas.width=300;
   canvas.height=100;
